@@ -30,14 +30,6 @@ const sendErrorDev = (err: Error, req: Request, res: Response) => {
         let error = {...err}
         error.message = err.message
         sendErrorProd(error, req, res)
-        if(error.name === 'JsonWebTokenError') {
-            error = handleJWTError()
-        } else if(error.name === 'handleJWTExpiredError') {
-            error = handleJWTExpiredError()
-        } else {
-            error = handleJWTError()
-        }
-        sendErrorProd(error, req, res)
     }
 }
 export default errorHandler
