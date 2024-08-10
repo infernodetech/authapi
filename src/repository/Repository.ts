@@ -60,10 +60,10 @@ function handleCodesPrisma(error: any, entityName : string): Error {
             return new Duplicated(entityName)
         case 'P2014':
             // handling invalid id errors
-            return new CustomError(`Invalid ID: ${error.meta.target}`, 400);
+            return new InvalidValue('Invalid ID', `${error.meta.target}`);
         case 'P2003':
             // handling invalid data errors
-            return new InvalidValue(`input data`, `${error.meta.target}`)
+            return new ValidationError(`input data`, `${error.meta.target}`)
         case 'P2025':
           return new NotFound(entityName)
         default:

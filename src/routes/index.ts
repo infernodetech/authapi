@@ -21,6 +21,8 @@ import '../containerConfig'
  *             - username
  *             - password
  *             - email
+ *             - firstname
+ *             - lastname
  *           properties:
  *             username:
  *               type: string
@@ -40,10 +42,8 @@ import '../containerConfig'
  *     responses:
  *       '201':
  *         description: User was created successfully
- *       '422':
- *         description: The username or the email already exists
  *       '400':
- *         description: The format of some of the user fields is not valid
+ *         description: Some of the required fields already exists
  *       '500':
  *         description: Internal server error
  */
