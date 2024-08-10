@@ -29,7 +29,7 @@ export default class Repository {
             if (errorType.toLowerCase().includes('prisma')) {
                 switch (errorType) {
                     case 'PrismaClientInitializationError':
-                        return new DatabaseConnectionError(error.message)
+                        return new DatabaseConnectionError()
 
                     case 'PrismaClientKnownRequestError':
                         return handleCodesPrisma(error, name);
