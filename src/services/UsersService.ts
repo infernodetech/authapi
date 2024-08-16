@@ -1,17 +1,17 @@
 import UserRepository from "../repository/UserRepository";
 import UserDTOConverter, {UserDTO} from "../dto/UserDTO";
-import {AdministrationRoles, Administrator, Role, User} from "@prisma/client";
+import {User} from "@prisma/client";
 import CustomError from "../errors/CustomError";
 import 'reflect-metadata';
 import {inject, injectable} from "tsyringe";
 import {compare, genSalt, hash} from "bcrypt";
 import IService from "./IService";
 import Service from "./Service";
-import IRepository, {IUserRepository} from "../repository/IRepository";
+import IRepository from "../repository/IRepository";
 @injectable()
 export default class UsersService extends Service implements IService<User, UserDTO> {
     constructor(
-        @inject('UserRepository') private _repository: IUserRepository
+        @inject('UserRepository') private _repository: UserRepository
     ) {
         super()
     }
@@ -57,13 +57,7 @@ export default class UsersService extends Service implements IService<User, User
                 }
             })
         })
-         let createdUser :   User & {
-             administrator: (Administrator & {
-                 administratorRoles: (AdministrationRoles & { role: Role })[]
-             }) | null
-         }
-
-
+         let createdUser :   User | null = null
         try {
           createdUser = await this._repository.save(user)
         } catch (e) {
@@ -74,11 +68,7 @@ export default class UsersService extends Service implements IService<User, User
 
 
     async getById(id: string): Promise<UserDTO> {
-        let user: User & {
-            administrator: (Administrator & {
-                administratorRoles: (AdministrationRoles & { role: Role })[]
-            }) | null;
-        } | null= null
+        let user: User | null = null
         try {
             user = await this._repository.findById(id);
         }  catch(e) {
@@ -91,22 +81,14 @@ export default class UsersService extends Service implements IService<User, User
 
     async getByUsername(username : string) : Promise<UserDTO> {
 
-       return  await  this.getByUsernameCallback(username, (user :  User & {
-           administrator: (Administrator & {
-               administratorRoles: (AdministrationRoles & { role: Role })[]
-           }) | null;
-       }) => {
-            return UserDTOConverter.getConverter().convertToDTO(user);
+       return  await  this.getByUsernameCallback(username, (user :  User | null) => {
+            return UserDTOConverter.getConverter().convertToDTO(user!);
         })
     }
 
 
     private async getByUsernameCallback(username : string, cb : Function) {
-        let user : User & {
-            administrator: (Administrator & {
-                administratorRoles: (AdministrationRoles & { role: Role })[]
-            }) | null;
-        } | null = null
+        let user : User | null = null
         try {
             user = await this._repository.findByUsername(username)
         } catch(e) {
@@ -118,13 +100,7 @@ export default class UsersService extends Service implements IService<User, User
 
     async singIn(username : string, password : string) : Promise<UserDTO> {
         let user = await this.getByUsernameCallback(username,
-            (user : User & {
-                administrator: (Administrator & {
-                    administratorRoles: (AdministrationRoles & { role: Role })[]
-                }) | null;
-            }) => {
-                    return user
-        })
+            (user : User | null) => {return user})
         let result = await compare(password, user.password);
         if (!result) {
             throw new CustomError('Invalid credentials', 401);
@@ -134,11 +110,7 @@ export default class UsersService extends Service implements IService<User, User
     }
 
     async remove(id: string): Promise<UserDTO> {
-        let user :  User & {
-            administrator: (Administrator & {
-                administratorRoles: (AdministrationRoles & { role: Role })[]
-            }) | null;
-        } | null= null;
+        let user : User | null = null;
          try {
              user = await this._repository.delete(id)
          } catch(e) {
@@ -149,11 +121,7 @@ export default class UsersService extends Service implements IService<User, User
     }
 
     async update(user: User): Promise<UserDTO> {
-        let updatedUser :   User & {
-            administrator: (Administrator & {
-                administratorRoles: (AdministrationRoles & { role: Role })[]
-            }) | null;
-        } | null = null
+        let updatedUser :   User | null = null
         try {
             updatedUser = await this._repository.update(user)
         } catch(e) {

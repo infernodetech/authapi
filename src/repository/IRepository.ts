@@ -9,36 +9,6 @@ export default interface IRepository<T> {
     delete(id : string) : Promise<T>
 }
 
-
-export interface IUserRepository extends IRepository<User> {
-
-    findByUsername(username : string) : Promise<User & {
-        administrator: (Administrator & {
-            administratorRoles: (AdministrationRoles & { role: Role })[]
-        }) | null;
-    }>
-
-    findById(id : string) : Promise<User & {
-        administrator: (Administrator & {
-            administratorRoles: (AdministrationRoles & { role: Role })[]
-        }) | null;
-    }>
-
-    save(user : User) : Promise<User & {
-        administrator: (Administrator & {
-            administratorRoles: (AdministrationRoles & { role: Role })[]
-        }) | null;
-    }>
-
-    update(user : User) : Promise<User & {
-        administrator: (Administrator & {
-            administratorRoles: (AdministrationRoles & { role: Role })[]
-        }) | null;
-    }>
-
-    delete(id : string) : Promise<User & {
-        administrator: (Administrator & {
-            administratorRoles: (AdministrationRoles & { role: Role })[]
-        }) | null;
-    }>
+export  interface UserRepository extends IRepository<User> {
+    findByUsername(username : string) : User
 }
