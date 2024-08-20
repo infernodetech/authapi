@@ -1,5 +1,5 @@
 import CustomError from "../errors/CustomError";
-import {User} from "@prisma/client";
+import {Scope, User} from "@prisma/client";
 
 export default interface IRepository<T> {
     findAll() : Promise<T[]>
@@ -9,6 +9,11 @@ export default interface IRepository<T> {
     delete(id : string) : Promise<T>
 }
 
-export  interface UserRepository extends IRepository<User> {
-    findByUsername(username : string) : User
+
+export interface IUserRepository extends IRepository<User> {
+    findByUsername(username : string) : Promise<User>
+}
+
+export interface IScopeRepository extends IRepository<Scope> {
+    findScopeByTokenandClientId(tokenId : string, clientId : string) : Promise<Scope>
 }

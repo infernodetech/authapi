@@ -1,5 +1,5 @@
 import AbstractDTOConverter from "./AbstractDTOConverter";
-import {AdministrationRoles, Administrator, Role, User} from "@prisma/client";
+import { User} from "@prisma/client";
 
  export class UserDTO {
     firstname : string

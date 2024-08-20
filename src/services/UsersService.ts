@@ -51,7 +51,7 @@ export default class UsersService extends Service implements IService<User, User
         user.password = await new Promise<string>((resolve, reject) => {
             hash(user.password, salt, (error, result) => {
                 if(error) {
-                    reject(new CustomError('Invalid credentials', 401))
+                    reject(new CustomError('Error creating credentials', 500))
                 } else {
                     resolve(result)
                 }

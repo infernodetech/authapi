@@ -7,7 +7,7 @@ import { swaggerDocs } from './config';
 import errorHandler  from './middleware/ErrorHandler';
 import * as indexRouter from './routes/index';
 require('dotenv').config();
-
+import * as scopesRouter from './routes/scopes'
 
 
 // Initialize Express app
@@ -22,6 +22,7 @@ app.use(cookieParser());
 
 // Routes
 app.use('/api/users', indexRouter.default);
+app.use('/api/scopes', scopesRouter.default)
 
 // Error handler
 app.use(errorHandler);

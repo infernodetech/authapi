@@ -23,7 +23,6 @@ const sendErrorDev = (err: Error, req: Request, res: Response) => {
 
 };
  const errorHandler = async  (err : Error, req  : Request,  res : Response, next : NextFunction) => {
-    console.log("Hello am I , the error handler")
     if(process.env.NODE_ENV === 'development') {
         sendErrorDev(err, req, res)
     } else if(process.env.NODE_ENV === 'production') {
