@@ -1,6 +1,6 @@
 import Repository from "./Repository";
 import IRepository from "./IRepository";
-import {AdministrationRoles, Administrator, Role, User} from "@prisma/client";
+import { User} from "@prisma/client";
 import 'reflect-metadata'
 import {injectable} from "tsyringe";
 
@@ -20,17 +20,6 @@ export default class UserRepository extends Repository implements IRepository<Us
                 where: {
                     username: username
                 },
-                include: {
-                    administrator: {
-                        include: {
-                            administratorRoles: {
-                                include: {
-                                    role: true
-                                }
-                            }
-                        }
-                    }
-                }
             })
             return user!
         } catch(e) {

@@ -1,5 +1,5 @@
 import CustomError from "../errors/CustomError";
-import {AdministrationRoles, Administrator, Role, User} from "@prisma/client";
+import {User} from "@prisma/client";
 
 export default interface IRepository<T> {
     findAll() : Promise<T[]>
