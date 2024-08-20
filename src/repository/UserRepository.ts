@@ -74,6 +74,4 @@ export default class UserRepository extends Repository implements IRepository<Us
         }
     }
 
-
-
 }
