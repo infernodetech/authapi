@@ -8,18 +8,19 @@ import errorHandler  from './middleware/ErrorHandler';
 import * as indexRouter from './routes/index';
 require('dotenv').config();
 import * as scopesRouter from './routes/scopes'
+import helmet from "helmet";
 
 
 // Initialize Express app
 const app = express();
 
 // Middleware
+app.use(helmet.xssFilter())
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use(logger(process.env.NODE_ENV!));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
 // Routes
 app.use('/api/users', indexRouter.default);
 app.use('/api/scopes', scopesRouter.default)
