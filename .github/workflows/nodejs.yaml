@@ -21,10 +21,10 @@ jobs:
         run: npm ci
 
       - name: Build application
-        run: npm run build # Adjust this if your build command is different
+        run: npm run build 
 
       - name: Archive build artifacts
-        run: tar -czf build-artifacts.tar.gz builds
+        run: tar -czf build-artifacts.tar.gz .
         shell: bash
 
       - name: Upload build artifacts
