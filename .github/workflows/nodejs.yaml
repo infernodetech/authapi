@@ -49,5 +49,5 @@ jobs:
         shell: bash
 
       - name: Run Node.js application
-        run: npx tsx ./build/dist/app.js
+        run: tsx dist/app.js
         shell: bash
