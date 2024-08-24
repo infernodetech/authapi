@@ -45,7 +45,7 @@ jobs:
           path: ./build
 
       - name: Extract build artifacts
-        run: tar -xzf ./build/build-artifacts.tar.gz -C ./build
+        run: tar -xzf ./build/build-artifacts.tar.gz -C .
         shell: bash
 
       - name: Run Node.js application
