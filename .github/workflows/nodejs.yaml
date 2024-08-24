@@ -24,7 +24,7 @@ jobs:
         run: npm run build 
 
       - name: Archive build artifacts
-        run: tar -czf build-artifacts.tar.gz .
+        run: tar -czf build-artifacts.tar.gz dist
         shell: bash
 
       - name: Upload build artifacts
