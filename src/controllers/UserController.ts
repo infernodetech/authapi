@@ -42,6 +42,7 @@ export default class UserController extends Controller {
 
    signUp = async (req : Request, res : Response, next : NextFunction) => {
        try {
+           if(!req.body.user) throw new CustomError('User must be specified', 400)
            res.status(201).json({user: await this._service.create(req.body.user)})
        } catch(e) {
            next(e)
