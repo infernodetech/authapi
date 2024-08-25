@@ -9,6 +9,7 @@ import * as indexRouter from './routes/index';
 require('dotenv').config();
 import * as scopesRouter from './routes/scopes'
 import helmet from "helmet";
+import morgan from "morgan";
 
 
 // Initialize Express app
@@ -18,6 +19,7 @@ const app = express();
 app.use(helmet.xssFilter())
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use(logger(process.env.NODE_ENV!));
+app.use(morgan('tiny'))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
