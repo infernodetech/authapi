@@ -45,6 +45,8 @@ export default class UserController extends Controller {
            if(!req.body.user) throw new CustomError('User must be specified', 400)
            res.status(201).json({user: await this._service.create(req.body.user)})
        } catch(e) {
+           console.log(e)
+           console.log(req.body)
            next(e)
        }
    }

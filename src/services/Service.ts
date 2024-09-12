@@ -1,6 +1,11 @@
 import CustomError, {InvalidValue, UnknownRequest} from "../errors/CustomError";
-
+import winston from 'winston';
 export default class Service {
+    protected logger = winston.createLogger({
+        level: 'debug',
+        format: winston.format.json(),
+        transports: [new winston.transports.Console()]
+    });
     protected translateError(error : Error) {
         error = (error as Error)
         switch (error.constructor.name) {

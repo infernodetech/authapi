@@ -10,12 +10,19 @@ require('dotenv').config();
 import * as scopesRouter from './routes/scopes'
 import helmet from "helmet";
 import morgan from "morgan";
-
+import cors from 'cors';
+import ejs from 'ejs'
+import path from "node:path";
 
 // Initialize Express app
 const app = express();
 
+app.set('view_engine', 'ejs')
+app.set('views', path.join(__dirname, 'views'))
+
 // Middleware
+
+app.use(cors({origin: '*'}))
 app.use(helmet.xssFilter())
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use(logger(process.env.NODE_ENV!));
@@ -29,6 +36,7 @@ app.use('/api/scopes', scopesRouter.default)
 
 // Error handler
 app.use(errorHandler);
+
 
 // Start server
 app.listen(process.env.PORT, () => {
