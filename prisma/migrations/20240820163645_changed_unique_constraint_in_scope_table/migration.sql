@@ -5,7 +5,7 @@
 
 */
 -- DropIndex
-DROP INDEX `scopes_jwt_client_id_user_id_key` ON `scopes_jwt`;
+DROP INDEX IF EXISTS `scopes_jwt_client_id_user_id_key` ON `scopes_jwt`;
 
 -- CreateIndex
 CREATE UNIQUE INDEX `scopes_jwt_client_id_token_id_key` ON `scopes_jwt`(`client_id`, `token_id`);

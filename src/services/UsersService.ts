@@ -106,6 +106,10 @@ export default class UsersService extends Service implements IService<User, User
             throw new CustomError('Invalid credentials', 401);
         }
 
+        if(!user.verifiedEmail) {
+            throw new CustomError('Email not verified', 401)
+        }
+
         return UserDTOConverter.getConverter().convertToDTO(user);
     }
 
@@ -130,4 +134,20 @@ export default class UsersService extends Service implements IService<User, User
         return UserDTOConverter.getConverter().convertToDTO(updatedUser)
     }
 
+    async verifyEmail(id : string ) : Promise<UserDTO> {
+        let user: User | null = null
+        try {
+            user = await this._repository.findById(id);
+        }  catch(e) {
+            throw this.translateError((e as Error))
+        }
+
+        if(user.verifiedEmail) {
+            throw new CustomError('Email already verified', 400)
+        }
+
+        user.verifiedEmail = true;
+        return await this.update(user)
+
+    }
 }

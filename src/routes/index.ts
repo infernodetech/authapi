@@ -48,6 +48,7 @@ import '../containerConfig'
  *         description: Internal server error
  */
 router.post('/register', controller.signUp)
+router.get('/email-confirm/:verificationToken', controller.emailConfirmation)
 /**
  * @swagger
  * /login:

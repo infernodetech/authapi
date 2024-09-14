@@ -4,15 +4,16 @@ import UsersService from "../services/UsersService";
 import {NextFunction, Request, Response} from 'express'
 import 'reflect-metadata'
 import {inject, injectable} from "tsyringe";
-import {generateToken} from "../util/token";
-import CustomError from "../errors/CustomError";
+import {encoder, generateToken} from "../util/token";
+import CustomError from "../errors/CustomError"
+import jose, {jwtDecrypt, jwtVerify} from 'jose'
 @injectable()
 export default class UserController extends Controller {
 
    constructor(
        @inject("UsersService") private _service: UsersService
    ) {
-       super();
+       super()                                          ;
    }
 
 
@@ -36,6 +37,14 @@ export default class UserController extends Controller {
        } catch (e) {
            next(e)
        }
+   }
+
+
+   obtainUser = async(req : Request, res : Response, next : NextFunction) => {
+       if(!req.body.user) {
+           res.status(400).send('Unauthorized')
+       }
+       res.status(200).send({user : req.body.user})
    }
 
 
@@ -74,5 +83,16 @@ export default class UserController extends Controller {
        }
    }
 
+   emailConfirmation = async(req : Request, res : Response, next : NextFunction) => {
+       try {
+           if(!req.params.verificationToken) throw new CustomError('Token invalid', 401)
+           const { payload } = await jwtVerify(req.params.verificationToken, encoder.encode(process.env.JWT_SECRET_TOKEN));
+           if('uid' in payload && typeof payload.uid === "string") {
+              return res.status(200).json({user: await this._service.verifyEmail(payload.uid.split('-')[0])})
+           }
+       } catch(e) {
+           return next(e)
+       }
+   }
 
  }

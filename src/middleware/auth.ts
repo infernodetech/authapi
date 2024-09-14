@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { jwtVerify } from "jose";
 import UserController from "../controllers/UserController";
-const encoder = new TextEncoder();
+import {encoder} from "../util/token";
 
 const authentication =  ( controller : UserController) => {
         return async (req: Request, res: Response, next: NextFunction) => {

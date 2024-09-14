@@ -5,7 +5,7 @@
 
 */
 -- DropForeignKey
-buALTER TABLE `administrators_permissions` DROP FOREIGN KEY `administrators_permissions_permission_id_fkey`;
+ALTER TABLE `administrators_permissions` DROP FOREIGN KEY `administrators_permissions_permission_id_fkey`;
 
 -- DropForeignKey
 ALTER TABLE `permissions_roles` DROP FOREIGN KEY `permissions_roles_role_id_fkey`;

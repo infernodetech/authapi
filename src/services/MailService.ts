@@ -2,24 +2,48 @@ import nodemailer from 'nodemailer';
 
 import dotenv from "dotenv";
 import Service from "./Service";
+import {generateToken} from "../util/token";
+import {injectable} from "tsyringe";
+import CustomError from "../errors/CustomError";
 dotenv.config();
 
-
+@injectable()
 export default class MailService extends Service {
-    sendMail = async (from: string, to: string, subject: string, html: string) => {
+
+
+    public validateEmailObject = async (email : JSON) => {
+        if('from' in email && 'to' in email && 'subject' in email && 'html' in email) {
+            for(const [key, value ] of Object.entries(email)) {
+                if(typeof value !== 'string') {
+                    throw new CustomError(`"${key} " : ${value} is not a valid string`, 400);
+                }
+            }
+
+        } else {
+            throw new CustomError(`The email object must contain from , to, subject and html text`, 400)
+        }
+    }
+    public  sendMail = async (from: string, to: string, subject: string, html: string, link? : string) => {
         const transporter = nodemailer.createTransport({
-            service: process.env.MAIL_HOST,
+            port: 587,
+            host: process.env.MAIL_HOST,
             auth: {
                 user: process.env.MAIL_USERNAME,
-                pass: process.env.MAIL_PASSWORD
+                pass: process.env.MAIL_PASSWORD,
             }
         });
+        console.log(`
+        User: ${process.env.MAIL_USERNAME} \n  
+        Password:${process.env.MAIL_PASSWORD} \n
+        Host:${process.env.MAIL_HOST}
+        `)
+
 
         const mailOptions = {
             from: from,
             to: to,
             subject: subject,
-            html: html
+            html: link === null ? html : `${html}<div>Link: <a href="${link}">${link}</a></div>`
         };
 
         this.logger.info(`Sending mail to - ${to}`);
@@ -30,5 +54,17 @@ export default class MailService extends Service {
                 this.logger.info('Email sent: ' + info.response);
             }
         });
+    }
+
+    public sendEmailVerification = async(from: string, to: string, subject: string, html: string, userid : string) => {
+        let link = await generateToken(`${userid}-${to}`)
+        link = `${process.env.MAIN_URL}/users/email-confirm/${link}`
+        await this.sendMail(from, to , subject, html, link)
+    }
+
+    public sendResetPasswordEmail = async(from: string, to: string, subject: string, html: string, userid : string) => {
+        let link = await generateToken(`${userid}-${process.env.PWDRST_KEY}`)
+        link = `${process.env.MAIN_URL}/users/password-reset/${link}`
+        await this.sendMail(from, to , subject, html, link)
     }
 }
