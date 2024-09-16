@@ -4,8 +4,12 @@ import {container} from "tsyringe";
 import UserController from "../controllers/UserController";
 const router = Router()
 import '../containerConfig'
+import tokenVerification from "../middleware/tokenVerification";
 
  const controller = container.resolve(UserController);
+router.get('/email-confirm/:verificationToken', tokenVerification, controller.emailConfirmation)
+router.post('/reset-password/:verificationToken', tokenVerification, controller.resetPassword)
+router.post('/reset-password', controller.resetPassword)
 /**
  * @swagger
  * /register:
@@ -48,7 +52,6 @@ import '../containerConfig'
  *         description: Internal server error
  */
 router.post('/register', controller.signUp)
-router.get('/email-confirm/:verificationToken', controller.emailConfirmation)
 /**
  * @swagger
  * /login:
@@ -113,5 +116,4 @@ router.get('/info' , controller.obtainAll)
  *         description: Internal server error
  */
 router.get('/user/:id', controller.obtainById)
-
 export default router

@@ -58,7 +58,10 @@ export default class ScopeService extends Service implements IService<Scope, Sco
         await this.checkScope(scope)
 
         try {
-            scope.tokenId = await generateToken(`${scope.clientId}-${scope.userId}`)
+            scope.tokenId = await generateToken({
+                clientId: scope.clientId,
+                userId: scope.userId
+            })
         } catch(e) {
             new CustomError('There is been an error generating the token', 500)
         }

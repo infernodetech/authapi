@@ -32,12 +32,6 @@ export default class MailService extends Service {
                 pass: process.env.MAIL_PASSWORD,
             }
         });
-        console.log(`
-        User: ${process.env.MAIL_USERNAME} \n  
-        Password:${process.env.MAIL_PASSWORD} \n
-        Host:${process.env.MAIL_HOST}
-        `)
-
 
         const mailOptions = {
             from: from,
@@ -57,13 +51,19 @@ export default class MailService extends Service {
     }
 
     public sendEmailVerification = async(from: string, to: string, subject: string, html: string, userid : string) => {
-        let link = await generateToken(`${userid}-${to}`)
+        let link = await generateToken({
+            userid: userid,
+            email: to
+        })
         link = `${process.env.MAIN_URL}/users/email-confirm/${link}`
         await this.sendMail(from, to , subject, html, link)
     }
 
     public sendResetPasswordEmail = async(from: string, to: string, subject: string, html: string, userid : string) => {
-        let link = await generateToken(`${userid}-${process.env.PWDRST_KEY}`)
+        let link = await generateToken({
+            userid: userid,
+            passwordRestToken: process.env.PWDRST_KEY
+        })
         link = `${process.env.MAIN_URL}/users/password-reset/${link}`
         await this.sendMail(from, to , subject, html, link)
     }

@@ -9,11 +9,9 @@ const authentication =  ( controller : UserController) => {
             if (userCookie) {
                 try {
                     const { payload } = await jwtVerify(userCookie, encoder.encode(process.env.JWT_SECRET_TOKEN));
-                    if('uid' in payload && typeof payload.uid === 'string') {
-                        req.body.user = await controller.getUserFromDatabase(payload.uid)
-                        if(!req.body.user) return res.status(401)
-                        return next()
-                    }
+                    req.body.user = await controller.getUserFromDatabase((payload as any).data.userid)
+                    if(!req.body.user) return res.status(401)
+                    return next()
                 } catch (e) {
                     return res.status(401).json('Invalid token');
                 }

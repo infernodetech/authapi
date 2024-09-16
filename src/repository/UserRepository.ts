@@ -21,10 +21,23 @@ export default class UserRepository extends Repository implements IRepository<Us
                     username: username
                 },
             })
-            return user!
+                return user!
         } catch(e) {
             throw this.handlePrismaErrors(e)
         }
+    }
+
+    async findByEmail(email : string) : Promise<User> {
+       try {
+           let user = await Repository.getPrismaClient().user.findUnique({
+               where: {
+                   email: email
+               },
+           })
+           return user!
+       } catch(e) {
+           throw this.handlePrismaErrors(e)
+       }
     }
     async findById(id: string): Promise<User> {
         try {

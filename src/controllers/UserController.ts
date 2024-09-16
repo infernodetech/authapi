@@ -6,7 +6,6 @@ import 'reflect-metadata'
 import {inject, injectable} from "tsyringe";
 import {encoder, generateToken} from "../util/token";
 import CustomError from "../errors/CustomError"
-import jose, {jwtDecrypt, jwtVerify} from 'jose'
 @injectable()
 export default class UserController extends Controller {
 
@@ -40,10 +39,7 @@ export default class UserController extends Controller {
    }
 
 
-   obtainUser = async(req : Request, res : Response, next : NextFunction) => {
-       if(!req.body.user) {
-           res.status(400).send('Unauthorized')
-       }
+   obtainUser = async(req : Request, res : Response) => {
        res.status(200).send({user : req.body.user})
    }
 
@@ -72,7 +68,9 @@ export default class UserController extends Controller {
                throw new CustomError('Invalid Authorization header format', 401);
            }
             user = await this._service.singIn(user, password)
-           res.cookie('UserCookie',  await generateToken(user.id), {
+           res.cookie('UserCookie',  await generateToken({
+               userid: user.id
+           }), {
                maxAge: 60 * 60 * 3600,
                secure: true,
                sameSite: "none"
@@ -85,11 +83,26 @@ export default class UserController extends Controller {
 
    emailConfirmation = async(req : Request, res : Response, next : NextFunction) => {
        try {
-           if(!req.params.verificationToken) throw new CustomError('Token invalid', 401)
-           const { payload } = await jwtVerify(req.params.verificationToken, encoder.encode(process.env.JWT_SECRET_TOKEN));
-           if('uid' in payload && typeof payload.uid === "string") {
-              return res.status(200).json({user: await this._service.verifyEmail(payload.uid.split('-')[0])})
+           return res.status(200).json({
+               user: await this._service.verifyEmail(req.body.data.userid),
+               verifiedEmail: req.body.data.email
            }
+
+           )
+
+       } catch(e) {
+           return next(e)
+       }
+   }
+
+
+   resetPassword = async(req : Request, res : Response, next : NextFunction) => {
+       try {
+           if(!req.body.newPassword) throw new CustomError(`A new password must be provided`, 400)
+           if(!req.body.data.passwordResetToken) throw new CustomError(`The current password must be provided`, 401)
+           return res.status(200).json({
+               user : await this._service.resetPassword(req.body.data.userid, req.body.newPassword, req.body.data.passwordResetToken),
+           })
        } catch(e) {
            return next(e)
        }

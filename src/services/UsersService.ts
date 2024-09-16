@@ -8,6 +8,7 @@ import {compare, genSalt, hash} from "bcrypt";
 import IService from "./IService";
 import Service from "./Service";
 import IRepository from "../repository/IRepository";
+import {hashString} from "../util/utils";
 @injectable()
 export default class UsersService extends Service implements IService<User, UserDTO> {
     constructor(
@@ -45,17 +46,11 @@ export default class UsersService extends Service implements IService<User, User
         }
     }
 
+
     async create(user : User) : Promise<UserDTO> {
         await this.checkUserInfo(user)
-        let salt = await genSalt(10)
-        user.password = await new Promise<string>((resolve, reject) => {
-            hash(user.password, salt, (error, result) => {
-                if(error) {
-                    reject(new CustomError('Error creating credentials', 500))
-                } else {
-                    resolve(result)
-                }
-            })
+        user.password = await hashString(user.password, () => {
+            new CustomError('Error creating credentials', 500)
         })
          let createdUser :   User | null = null
         try {
@@ -68,47 +63,62 @@ export default class UsersService extends Service implements IService<User, User
 
 
     async getById(id: string): Promise<UserDTO> {
-        let user: User | null = null
-        try {
-            user = await this._repository.findById(id);
-        }  catch(e) {
-            throw this.translateError((e as Error))
-        }
-        if(user === null) throw new CustomError(`The user with id ${id} does not exists`, 404)
-        return UserDTOConverter.getConverter().convertToDTO(user);
+        return await this.getUserCallback(id, "id", (user : User) => {
+            return UserDTOConverter.getConverter().convertToDTO(user);
+        })
+
     }
 
 
     async getByUsername(username : string) : Promise<UserDTO> {
 
-       return  await  this.getByUsernameCallback(username, (user :  User | null) => {
+       return  await  this.getUserCallback(username, "username", (user :  User | null) => {
             return UserDTOConverter.getConverter().convertToDTO(user!);
         })
     }
 
 
-    private async getByUsernameCallback(username : string, cb : Function) {
-        let user : User | null = null
+    private async getUserCallback(searchParam: string, searchType: 'id' | 'email' | 'username', cb: Function) {
+        let user: User | null = null;
         try {
-            user = await this._repository.findByUsername(username)
+            switch (searchType) {
+                case 'id':
+                    user = await this._repository.findById(searchParam);
+                    break;
+                case 'email':
+                    user = await this._repository.findByEmail(searchParam);
+                    break;
+                case 'username':
+                    user = await this._repository.findByUsername(searchParam);
+                    break;
+            }
         } catch(e) {
-            throw this.translateError((e as Error))
+            this.translateError((e as Error))
         }
-        if(user === null) throw new CustomError(`The user with username ${username} does not exist`, 404)
-       return  cb(user)
+
+
+            if (user === null) {
+                throw new CustomError(`The user with ${searchType} ${searchParam} does not exist`, 404);
+            }
+
+
+
+        return cb(user);
     }
 
+
     async singIn(username : string, password : string) : Promise<UserDTO> {
-        let user = await this.getByUsernameCallback(username,
+        let user = await this.getUserCallback(username, "username",
             (user : User | null) => {return user})
-        let result = await compare(password, user.password);
-        if (!result) {
-            throw new CustomError('Invalid credentials', 401);
-        }
+
 
         if(!user.verifiedEmail) {
             throw new CustomError('Email not verified', 401)
         }
+        if (!await compare(password, user.password)) {
+            throw new CustomError('Invalid credentials', 401);
+        }
+
 
         return UserDTOConverter.getConverter().convertToDTO(user);
     }
@@ -135,19 +145,32 @@ export default class UsersService extends Service implements IService<User, User
     }
 
     async verifyEmail(id : string ) : Promise<UserDTO> {
-        let user: User | null = null
-        try {
-            user = await this._repository.findById(id);
-        }  catch(e) {
-            throw this.translateError((e as Error))
-        }
+      return this.getUserCallback(id, "id", async (user : User ) => {
+          if(user.verifiedEmail) {
+              throw new CustomError('Email already verified', 400)
+          }
 
-        if(user.verifiedEmail) {
-            throw new CustomError('Email already verified', 400)
-        }
+          user.verifiedEmail = true;
+          return await this.update(user)
+      })
 
-        user.verifiedEmail = true;
-        return await this.update(user)
 
+
+    }
+
+
+    async resetPassword(email : string, newPassword : string, resetVerification : string) : Promise<UserDTO> {
+
+        return await this.getUserCallback(email, "email", async(user : User) => {
+            if(await compare(resetVerification, user.password) || await compare(process.env.PWDRST_KEY!, resetVerification)) {
+                user.password = await hashString(newPassword, () => {
+                    throw new CustomError(`There is been an error creating new password`, 500)
+                })
+                return this.update(user)
+            } else {
+                throw new CustomError('Invalid link', 401)
+            }
+
+        })
     }
 }

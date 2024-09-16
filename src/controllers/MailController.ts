@@ -28,6 +28,7 @@ export default class MailController extends Controller {
             await this._service.sendEmailVerification(req.body.email.from, req.body.email.to, req.body.email.subject,
                                                       req.body.email.html, req.body.userid
                                                      )
+            res.status(200).send()
         } catch(e) {
             console.log(e)
             next(e)
