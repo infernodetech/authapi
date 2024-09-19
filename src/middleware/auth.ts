@@ -9,7 +9,7 @@ const authentication =  ( controller : UserController) => {
             if (userCookie) {
                 try {
                     const { payload } = await jwtVerify(userCookie, encoder.encode(process.env.JWT_SECRET_TOKEN));
-                    req.body.user = await controller.getUserFromDatabase((payload as any).data.userid)
+                    req.body.userid = (payload as any).data.userid
                     if(!req.body.user) return res.status(401)
                     return next()
                 } catch (e) {
