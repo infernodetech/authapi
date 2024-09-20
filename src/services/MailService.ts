@@ -23,7 +23,7 @@ export default class MailService extends Service {
             throw new CustomError(`The email object must contain from , to, subject and html text`, 400)
         }
     }
-    public  sendMail = async (from: string, to: string, subject: string, html: string, link? : string) => {
+    public  sendMail = async (to: string, subject: string, html: string, link? : string) => {
         const transporter = nodemailer.createTransport({
             port: 587,
             host: process.env.MAIL_HOST,
@@ -34,7 +34,7 @@ export default class MailService extends Service {
         });
 
         const mailOptions = {
-            from: from,
+            from: process.env.MAIL_USERNAME,
             to: to,
             subject: subject,
             html: link === null ? html : `${html}<div>Link: <a href="${link}">${link}</a></div>`
@@ -50,21 +50,5 @@ export default class MailService extends Service {
         });
     }
 
-    public sendEmailVerification = async(from: string, to: string, subject: string, html: string, userid : string) => {
-        let link = await generateToken({
-            userid: userid,
-            email: to
-        })
-        link = `${process.env.MAIN_URL}/users/email-confirm/${link}`
-        await this.sendMail(from, to , subject, html, link)
-    }
 
-    public sendResetPasswordEmail = async(from: string, to: string, subject: string, html: string, userid : string) => {
-        let link = await generateToken({
-            userid: userid,
-            passwordRestToken: process.env.PWDRST_KEY
-        })
-        link = `${process.env.MAIN_URL}/users/password-reset/${link}`
-        await this.sendMail(from, to , subject, html, link)
-    }
 }

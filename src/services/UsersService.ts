@@ -9,10 +9,13 @@ import IService from "./IService";
 import Service from "./Service";
 import IRepository from "../repository/IRepository";
 import {hashString} from "../util/utils";
+import MailService from "./MailService";
+import UserMailService from "./UserMailService";
 @injectable()
 export default class UsersService extends Service implements IService<User, UserDTO> {
     constructor(
-        @inject('UserRepository') private _repository: UserRepository
+        @inject('UserRepository') private _repository: UserRepository,
+        @inject("UserMailService") private _mail : UserMailService
     ) {
         super()
     }
@@ -52,13 +55,15 @@ export default class UsersService extends Service implements IService<User, User
         user.password = await hashString(user.password, () => {
             new CustomError('Error creating credentials', 500)
         })
-         let createdUser :   User | null = null
         try {
-          createdUser = await this._repository.save(user)
+          user = await this._repository.save(user)
         } catch (e) {
            throw this.translateError((e as Error))
         }
-        return UserDTOConverter.getConverter().convertToDTO(createdUser)
+
+        this._mail.sendEmailVerification(user.email, "Resetear contraseña", `Bienvenido ${user.firstname}, 
+        Haz click en el enlace que se muestra a continuacion para verificar tu correo electronico`, user.id)
+        return UserDTOConverter.getConverter().convertToDTO(user)
     }
 
 
@@ -68,15 +73,6 @@ export default class UsersService extends Service implements IService<User, User
         })
 
     }
-
-
-    async getByUsername(username : string) : Promise<UserDTO> {
-
-       return  await  this.getUserCallback(username, "username", (user :  User | null) => {
-            return UserDTOConverter.getConverter().convertToDTO(user!);
-        })
-    }
-
 
     private async getUserCallback(searchParam: string, searchType: 'id' | 'email' | 'username', cb: Function) {
         let user: User | null = null;
@@ -159,6 +155,11 @@ export default class UsersService extends Service implements IService<User, User
     }
 
 
+    async sendPasswordReset(email : string) : Promise<UserDTO> {
+        return await this.getUserCallback(email, "email", (user : User) => {
+            this._mail.sendResetPasswordEmail(user.email, "Reestablecer  contraseña", "Haz click en el siguiente link para reestablecer la contraseña", user.id)
+        })
+    }
     async resetPassword(email : string, newPassword : string, resetVerification : string) : Promise<UserDTO> {
 
         return await this.getUserCallback(email, "email", async(user : User) => {

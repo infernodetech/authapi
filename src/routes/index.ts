@@ -4,12 +4,12 @@ import {container} from "tsyringe";
 import UserController from "../controllers/UserController";
 const router = Router()
 import '../containerConfig'
-import tokenVerification from "../middleware/tokenVerification";
+import tokenVerificationUrl from "../middleware/tokenVerificationUrl";
 
  const controller = container.resolve(UserController);
-router.get('/email-confirm/:verificationToken', tokenVerification, controller.emailConfirmation)
-router.post('/reset-password/:verificationToken', tokenVerification, controller.resetPassword)
-router.post('/reset-password', controller.resetPassword)
+router.get('/email-confirm/:verificationToken', tokenVerificationUrl, controller.emailConfirmation)
+router.get('/reset-password/:verificationToken', tokenVerificationUrl, controller.resetPassword)
+router.post('/reset-password', controller.requestPasswordReset)
 /**
  * @swagger
  * /register:

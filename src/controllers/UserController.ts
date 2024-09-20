@@ -84,8 +84,7 @@ export default class UserController extends Controller {
    emailConfirmation = async(req : Request, res : Response, next : NextFunction) => {
        try {
            return res.status(200).json({
-               user: await this._service.verifyEmail(req.body.data.userid),
-               verifiedEmail: req.body.data.email
+               user: await this._service.verifyEmail(req.body.data.userid)
            }
 
            )
@@ -103,6 +102,17 @@ export default class UserController extends Controller {
            return res.status(200).json({
                user : await this._service.resetPassword(req.body.data.userid, req.body.newPassword, req.body.data.passwordResetToken),
            })
+       } catch(e) {
+           return next(e)
+       }
+   }
+
+
+   requestPasswordReset = async(req : Request, res : Response, next : NextFunction) => {
+       try {
+           if(!req.body.email) throw new CustomError(`An email must be provided`, 400)
+           await this._service.sendPasswordReset(req.body.email)
+           return res.status(200)
        } catch(e) {
            return next(e)
        }

@@ -7,3 +7,4 @@ export default interface IService<U, T> {
     update(object : U) : Promise<T>
     remove(id : string) : Promise<T>
 }
+

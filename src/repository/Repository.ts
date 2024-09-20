@@ -53,11 +53,9 @@ export default class Repository {
 
 
 function handleCodesPrisma(error: any, entityName : string): Error {
-    console.log(error.code)
     switch (error.code) {
         case 'P2002':
-            // handling duplicate key errors
-            return new Duplicated(entityName)
+            return new Duplicated(error.message.split(':')[2].split("_")[1].toUpperCase())
         case 'P2014':
             // handling invalid id errors
             return new InvalidValue('Invalid ID', `${error.meta.target}`);

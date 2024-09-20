@@ -7,7 +7,7 @@ const handleJWTExpiredError = () => new CustomError('Token has expired please lo
 
 const sendErrorProd = (err: Error, req: Request, res: Response) => {
     return res.status((err as  CustomError).statusCode ?? 500).json({
-        status: (err as CustomError).status ?? 'error',
+        type: (err as CustomError).type ?? 'error',
         message: err.message
     })
 
@@ -15,7 +15,7 @@ const sendErrorProd = (err: Error, req: Request, res: Response) => {
 
 const sendErrorDev = (err: Error, req: Request, res: Response) => {
     res.status((err as CustomError).statusCode ?? 500).json({
-        status: (err as CustomError).status ?? 'error',
+        status: (err as CustomError).type ?? 'error',
         errors: err,
         message: err.message,
         stack: err.stack,

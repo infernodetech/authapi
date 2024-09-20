@@ -5,7 +5,7 @@ import {jwtVerify} from "jose";
 import {encoder} from "../util/token";
 
 
-const tokenVerification = async (req: Request, res : Response, next : NextFunction) => {
+const tokenVerificationUrl = async (req: Request, res : Response, next : NextFunction) => {
     if(!req.params.verificationToken) throw new CustomError('A valid token must be provided', 401)
    try {
        const { payload } = await jwtVerify(req.params.verificationToken, encoder.encode(process.env.JWT_SECRET_TOKEN));
@@ -16,4 +16,4 @@ const tokenVerification = async (req: Request, res : Response, next : NextFuncti
    }
 
 }
-export default tokenVerification
+export default tokenVerificationUrl

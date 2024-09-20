@@ -10,9 +10,7 @@ require('dotenv').config();
 import * as scopesRouter from './routes/scopes'
 import helmet from "helmet";
 import morgan from "morgan";
-import * as emailRouter from './routes/email'
 import cors from 'cors'
-
 // Initialize Express app
 const app = express();
 app.use(cors({
@@ -29,14 +27,16 @@ app.use(cookieParser());
 // Routes
 app.use('/api/users', indexRouter.default);
 app.use('/api/scopes', scopesRouter.default)
-app.use('/api/email', emailRouter.default);
 
 // Error handler
 app.use(errorHandler);
 
 // Start server
+if(process.env.PORT === undefined) throw new Error("There is no PORT specified")
 app.listen(process.env.PORT, () => {
     console.log(`Server is up on PORT: ${process.env.PORT}`);
+
 });
+
 
 export default app;

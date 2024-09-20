@@ -1,10 +1,10 @@
 export default class CustomError extends Error {
     statusCode : number;
-    status?: string;
-    constructor(message: string, code : number, status? : string) {
+    type?: string;
+    constructor(message: string, code : number, type? : string) {
         super(message)
         this.statusCode = code
-        this.status = status
+        this.type = type
     }
 }
 
@@ -16,13 +16,14 @@ export  class NotFound extends Error {
 
 export class Duplicated extends Error {
     constructor(value : string ) {
-        super(`Duplicated ${value}`);
+        super(value);
+
     }
 }
 
 export class InvalidValue extends Error {
     constructor(type: string, value : string) {
-        super(`Invalid  ${type}: ${value}`);
+        super(`${type}: ${value}`)
     }
 }
 
