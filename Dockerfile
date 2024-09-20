@@ -36,11 +36,6 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 # Copy the rest of the source files into the image.
 COPY . .
 
-# Run the Prisma generate command to generate Prisma client as root.
-RUN npx prisma generate
-
-# Run the build script.
-RUN npm run build
 
 ################################################################################
 # Create a new stage to run the application with minimal runtime dependencies
@@ -66,7 +61,4 @@ RUN chown -R node:node /usr/src/app
 USER node
 
 # Expose the port that the application listens on.
-EXPOSE 3000
-
-# Run Prisma migrations, generate the Prisma client (if necessary), and then start the application.
-CMD npx prisma migrate deploy && npx prisma generate && npm start
+EXPOSE PORT
