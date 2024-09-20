@@ -52,4 +52,4 @@ RUN chown -R node:node /usr/src/app
 USER node
 
 # Expose the port that the application listens on.
-EXPOSE PORT
+EXPOSE 3000
