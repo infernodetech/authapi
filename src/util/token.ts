@@ -8,7 +8,7 @@ export const generateToken =  async(data : Record<string, any>) => {
         .setIssuedAt()
         .setIssuer('')
         .setAudience('')
-        .setExpirationTime('1h')
+        .setExpirationTime('24h')
         .sign(secret)
 }
 

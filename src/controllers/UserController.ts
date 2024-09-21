@@ -16,6 +16,10 @@ export default class UserController extends Controller {
    }
 
 
+   public getService() {
+       return this._service
+   }
+
 
    obtainAll = async (req : Request, res : Response, next : NextFunction) => {
        try {
@@ -24,23 +28,15 @@ export default class UserController extends Controller {
            next(e);
        }
    }
-   async getUserFromDatabase(userId : string) {
-      return await this._service.getById(userId)
-   }
 
    obtainById = async (req : Request, res : Response, next : NextFunction) => {
 
        try {
            if(!req.params.id) res.status(400).send('An id should be provided')
-           res.status(200).json(await this.getUserFromDatabase(req.params.id))
+           res.status(200).json(await  this._service.getById(req.params.id))
        } catch (e) {
            next(e)
        }
-   }
-
-
-   obtainUser = async(req : Request, res : Response) => {
-       res.status(200).send({user : req.body.user})
    }
 
 
@@ -75,7 +71,7 @@ export default class UserController extends Controller {
                secure: true,
                sameSite: "none"
            })
-           return res.status(200).json({user: {...user}})
+           return res.status(200).send()
        } catch(e) {
           return next(e)
        }

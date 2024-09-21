@@ -4,6 +4,7 @@ import UserController from "../controllers/UserController";
 import {encoder} from "../util/token";
 
 const authentication =  ( controller : UserController) => {
+
         return async (req: Request, res: Response, next: NextFunction) => {
             let userCookie = req.cookies.UserCookie;
             if (userCookie) {

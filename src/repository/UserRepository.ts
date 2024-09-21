@@ -18,6 +18,9 @@ export default class UserRepository extends Repository implements IUserRepositor
     async findByUsername(username: string): Promise<User> {
         try {
             let user = await Repository.getPrismaClient().user.findUnique({
+                include: {
+                    permissions: true
+                },
                 where: {
                     username: username
                 },
@@ -31,6 +34,9 @@ export default class UserRepository extends Repository implements IUserRepositor
     async findByEmail(email : string) : Promise<User> {
        try {
            let user = await Repository.getPrismaClient().user.findUnique({
+               include: {
+                 permissions: true
+               },
                where: {
                    email: email
                },
@@ -43,6 +49,9 @@ export default class UserRepository extends Repository implements IUserRepositor
     async findById(id: string): Promise<User> {
         try {
             let user = await Repository.getPrismaClient().user.findUnique({
+                include: {
+                    permissions: true,
+                },
                 where: {
                     id: id
                 },
@@ -66,6 +75,9 @@ export default class UserRepository extends Repository implements IUserRepositor
     async update(user: User): Promise<User> {
         try {
             return await Repository.getPrismaClient().user.update({
+                include: {
+                    permissions: true
+                },
                 where: {
                     id: user.id
                 },
