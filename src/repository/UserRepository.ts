@@ -1,11 +1,12 @@
 import Repository from "./Repository";
-import IRepository from "./IRepository";
+import IRepository, {IUserRepository} from "./IRepository";
 import { User} from "@prisma/client";
 import 'reflect-metadata'
-import {injectable} from "tsyringe";
+import {injectable, singleton} from "tsyringe";
 
 @injectable()
-export default class UserRepository extends Repository implements IRepository<User> {
+@singleton()
+export default class UserRepository extends Repository implements IUserRepository {
    async  findAll(): Promise<User[]> {
         try {
             return await Repository.getPrismaClient().user.findMany({

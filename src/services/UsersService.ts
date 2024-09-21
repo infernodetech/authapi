@@ -3,21 +3,22 @@ import UserDTOConverter, {UserDTO} from "../dto/UserDTO";
 import {User} from "@prisma/client";
 import CustomError from "../errors/CustomError";
 import 'reflect-metadata';
-import {inject, injectable} from "tsyringe";
+import {inject, injectable, singleton} from "tsyringe";
 import {compare, genSalt, hash} from "bcrypt";
 import IService from "./IService";
 import Service from "./Service";
 import IRepository from "../repository/IRepository";
 import {hashString} from "../util/utils";
-import MailService from "./MailService";
 import UserMailService from "./UserMailService";
 @injectable()
+@singleton()
 export default class UsersService extends Service implements IService<User, UserDTO> {
+    private readonly _mail : UserMailService;
     constructor(
         @inject('UserRepository') private _repository: UserRepository,
-        @inject("UserMailService") private _mail : UserMailService
     ) {
         super()
+        this._mail = new UserMailService()
     }
     async getAll() :  Promise<UserDTO[]> {
         let users : User[] = []

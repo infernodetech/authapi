@@ -1,4 +1,4 @@
-import {inject, injectable} from "tsyringe";
+import {inject, injectable, singleton} from "tsyringe";
 import Service from "./Service";
 import IService from "./IService";
 import {Scope, User} from "@prisma/client";
@@ -10,6 +10,7 @@ import UserDTOConverter from "../dto/UserDTO";
 import {generateToken} from "../util/token";
 
 @injectable()
+@singleton()
 export default class ScopeService extends Service implements IService<Scope, ScopeDTO> {
 
     constructor(

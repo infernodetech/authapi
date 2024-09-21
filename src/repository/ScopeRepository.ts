@@ -1,9 +1,11 @@
 import Repository from "./Repository";
-import IRepository from "./IRepository";
+import IRepository, {IScopeRepository} from "./IRepository";
 import {Scope} from "@prisma/client";
-import {injectable} from "tsyringe";
+import 'reflect-metadata'
+import {injectable, singleton} from "tsyringe";
 @injectable()
-export default class ScopeRepository extends Repository implements IRepository<Scope> {
+@singleton()
+export default class ScopeRepository extends Repository implements IScopeRepository {
     async findAll(): Promise<Scope[]> {
         try {
             return await Repository.getPrismaClient().scope.findMany({
@@ -60,14 +62,15 @@ export default class ScopeRepository extends Repository implements IRepository<S
     }
 
 
-   async findScopeByTokenandClientId(tokenId : string, clientId : string) {
+   async findScopeByTokenandClientId(tokenId : string, clientId : string) : Promise<Scope> {
         try {
-            return await Repository.getPrismaClient().scope.findFirst({
+            let scope = await Repository.getPrismaClient().scope.findFirst({
                 where: {
                     tokenId: tokenId,
                     clientId: clientId
                 }
             })
+            return scope!
         }catch (e) {
             throw this.handlePrismaErrors(e)
         }

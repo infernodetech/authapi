@@ -31,7 +31,7 @@ export default class UserController extends Controller {
    obtainById = async (req : Request, res : Response, next : NextFunction) => {
 
        try {
-           if(!req.params.id) res.send('An id should be provided')
+           if(!req.params.id) res.status(400).send('An id should be provided')
            res.status(200).json(await this.getUserFromDatabase(req.params.id))
        } catch (e) {
            next(e)

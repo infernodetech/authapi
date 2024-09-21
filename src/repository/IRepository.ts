@@ -1,4 +1,3 @@
-import CustomError from "../errors/CustomError";
 import {Scope, User} from "@prisma/client";
 
 export default interface IRepository<T> {
